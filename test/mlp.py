@@ -4,7 +4,7 @@ from cProfile import label
 import glob
 import pandas as pd
 import csv
-
+import random 
 import numpy as np
 from numpy import asarray
 from pandas import read_csv
@@ -46,11 +46,13 @@ for excl_file in excl_list:
 
 df1=excl_merged.sample(frac=1)
 
-df1 = df1[['simulaton tick','L1 Instruction Cache Hits', 'L1 Instruction Cache Misses','L1 Data Cache Hits','L1 Data Cache Misses','Last Level Cache Hits','Last Level Cache Misses','DRAM Page Hit Rate ','status']] 
-test_df1=df1[['L1 Instruction Cache Hits', 'L1 Instruction Cache Misses','L1 Data Cache Hits','L1 Data Cache Misses','Last Level Cache Hits','Last Level Cache Misses','DRAM Page Hit Rate ','status']]
+df1 = df1[['simulaton tick','L1 Instruction Cache Hits', 'L1 Instruction Cache Misses','L1 Data Cache Hits','L1 Data Cache Misses','Last Level Cache Hits','Last Level Cache Misses','DRAM Page Hit Rate ','status','label']] 
+test_df1=df1[['L1 Instruction Cache Hits', 'L1 Instruction Cache Misses','L1 Data Cache Hits','L1 Data Cache Misses','Last Level Cache Hits','Last Level Cache Misses','DRAM Page Hit Rate ','label']]
+print(df1)
+print(test_df1)
 
 #print(df1)
-X, y = df1.values[:,1 :-1], df1.values[:, -1]
+X, y = df1.values[:,1 :-2], df1.values[:, -2]
 
 test_df1.to_csv("mycsv.csv", sep=',',index=False,header=False)
 
@@ -83,7 +85,7 @@ loss, acc = model.evaluate(X_test, y_test, verbose=0)
 print('Test Accuracy: %.3f' % acc)
 print('loss: %.3f' % loss)
 
-exit(0);
+ 
 
 
 total_count=0
@@ -93,21 +95,34 @@ with open('mycsv.csv', newline='') as f:
 	reader = csv.reader(f)
 	mylist=list(reader)
 
+
+
+#random_list=random.choices(mylist,k=1000)
+
+
+mylist.reverse()
 for i in mylist:
 	status=i.pop()
 	m=list(np.float_(i))
+	print(m)
+
 	yhat= model.predict([m])
 	print(status)
-	print('Predicted: %.3f' % yhat)
+	#print('Predicted: %.3f' % yhat)
 	total_count += 1
+	if(total_count == 1000):
+		break
 	if( yhat < 0.3):
 		predict='RWH'
+		predict1='RWH'
 	else:
 		predict='ST'
-	if(status == predict):
+		predict1='SPEC'
+	if(status == predict) or (status == predict1):
 		true_predict +=1
 	else:
 		wrong_predict +=1
+		print( "wrong predicted %.3f " %yhat)
 
 
 print(' total test ' +  str(total_count))
