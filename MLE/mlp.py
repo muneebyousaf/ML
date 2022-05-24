@@ -27,10 +27,12 @@ for file in file_list:
 
 	print(file);
 	mypd=pd.read_excel(file)
-	if(file == "2.xlsx") or ((file == "3.xlsx") ) :
+	'''
+	if(file != "1.xlsx") :
 		print(file)
 		mypd=pd.concat([mypd]*5, ignore_index=True)
 
+	'''
 	print(mypd.shape)
 	excl_list.append(mypd)
 
@@ -85,7 +87,6 @@ loss, acc = model.evaluate(X_test, y_test, verbose=0)
 print('Test Accuracy: %.3f' % acc)
 print('loss: %.3f' % loss)
 
- 
 
 
 total_count=0
@@ -104,17 +105,16 @@ mylist.reverse()
 for i in mylist:
 	status=i.pop()
 	m=list(np.float_(i))
-	print(m)
 
 	yhat= model.predict([m])
 	print(status)
-	#print('Predicted: %.3f' % yhat)
+	print('Predicted: %.3f' % yhat)
 	total_count += 1
 	if(total_count == 1000):
 		break
 	if( yhat < 0.3):
 		predict='RWH'
-		predict1='RWH'
+		predict1='FF'
 	else:
 		predict='ST'
 		predict1='SPEC'
