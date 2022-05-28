@@ -23,6 +23,7 @@ file_list = glob.glob("*.xlsx")
 # data into pand
 excl_list = []
 
+
 for file in file_list:
 
 	print(file);
@@ -61,7 +62,7 @@ test_df1.to_csv("mycsv.csv", sep=',',index=False,header=False)
 X = X.astype('float32')
 y = LabelEncoder().fit_transform(y)
 print(y)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.43)
 
 print(y)
 print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
@@ -86,7 +87,6 @@ model.fit(X_train, y_train, epochs=150, batch_size=32, verbose=0)
 loss, acc = model.evaluate(X_test, y_test, verbose=0)
 print('Test Accuracy: %.3f' % acc)
 print('loss: %.3f' % loss)
-
 
 
 total_count=0
@@ -140,74 +140,92 @@ SPEC_false_prediction=0
 
 
 for i in mylist:
-	print(i)
+	kk=i.copy()
 	status=i.pop()
 	m=list(np.float_(i))
 
 	yhat= model.predict([m])
-	print(status)
-	print('Predicted: %.3f' % yhat)
+	#print(status)
+	#print('Predicted: %.3f' % yhat)
 	total_count += 1
 
-	if(total_count == 1000):
+	if(total_count == 25000):
 		break
+	
 	if( status == 'FR'):
 		FR_counter +=1
-		if( yhat < 0.3):
+		if( yhat < 0.4):
 			FR_true_prediction +=1
 		else:
+			print(kk)
 			FR_false_prediction +=1
+			print('Predicted: %.3f, FR false: %d' %(yhat ,FR_false_prediction))
 
 
 	if( status == 'RWH'):
 		rwh_counter +=1
-		if( yhat < 0.3):
+		if( yhat < 0.4):
 			rwh_true_prediction +=1
 			
 		else:
+			print(kk)
 			rwh_false_prediction +=1
+			print('Predicted: %.3f, RWH false: %d' % (yhat,rwh_false_prediction))
 	
 
 
 	if( status == 'FF'):
 		FF_counter +=1
-		if( yhat < 0.3):
+		if( yhat < 0.4):
 			FF_true_prediction +=1
 		else:
+			print(kk)
+			print('Predicted: %.3f' % yhat)
 			FF_false_prediction +=1
+			print('Predicted: %.3f, FF false: %d' %(yhat,FF_false_prediction))
 	
 
 	if( status == 'SPT'):
 		SPT_counter +=1
-		if( yhat < 0.3):
+		if( yhat < 0.4):
 			SPT_true_prediction +=1
 		else:
+			print(kk)
+			print('Predicted: %.3f' % yhat)
 			SPT_false_prediction +=1
+			print('Predicted: %.3f, SPT false: %d' % (yhat,SPT_false_prediction))
 	
 	if( status == 'PF'):
 		PF_counter +=1
-		if( yhat < 0.3):
+		if( yhat < 0.4):
 			PF_true_prediction +=1	
 		else:
+			print(kk)
 			PF_false_prediction +=1
+			print('Predicted: %.3f, PF false: %d' %(yhat ,PF_false_prediction))
 	
 	
 	if( status == 'ST'):
 		ST_counter +=1
-		if( yhat < 0.3):
+		if( yhat < 0.4):
 			ST_false_prediction +=1
+			print(kk)
+			print('Predicted: %.3f, ST false: %d' % (yhat ,ST_false_prediction))
 		else:
 			ST_true_prediction +=1
+
 
 	
 	if( status == 'SPEC'):
 		SPEC_counter +=1
-		if( yhat < 0.3):
+		if( yhat < 0.4):
 			SPEC_false_prediction +=1
+			print(kk)
+			print('Predicted: %.3f, SPEC false: %d' % (yhat,SPEC_false_prediction))
 		else:
 				SPEC_true_prediction +=1
 
-				
+
 print (' Total number of samples: %d' %total_count)
 true_predict1= rwh_true_prediction+FF_true_prediction+SPT_true_prediction+PF_true_prediction+FR_true_prediction+ST_true_prediction+SPEC_true_prediction
 wrong_predict1= rwh_false_prediction+FF_false_prediction+SPT_false_prediction+PF_false_prediction+FR_false_prediction+ST_false_prediction+SPEC_false_prediction;
@@ -217,8 +235,8 @@ print(" false auu: %d" %wrong_predict1)
 true_percentage= (true_predict1/total_count)* 100;
 false_pecentage=(wrong_predict1/total_count)*100;
 
-print( ' percentage of correct prediction: %0.3f' %true_percentage)
-print('percentage of wrong prediction: %0.3f ' % false_pecentage)
+print( ' percentage of correct prediction: %0.4f' %true_percentage)
+print('percentage of wrong prediction: %0.4f ' % false_pecentage)
 
 
 print('Row hammer sample counter: %d' % rwh_counter)
@@ -271,7 +289,7 @@ print(tf1)
 			
 '''
 
-	if( yhat < 0.3):
+	if( yhat < 0.4):
 		predict='RWH'
 		predict1='FF'
 		predict2='SPT'
