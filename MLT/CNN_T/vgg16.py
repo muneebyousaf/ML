@@ -3,8 +3,15 @@ from keras.applications.vgg16 import VGG16
 from matplotlib import pyplot
 # load the model
 model = VGG16()
-# retrieve weights from the second hidden layer
-filters, biases = model.layers[1].get_weights()
+# summarize filter shapes
+for layer in model.layers:
+	# check for convolutional layer
+	if 'conv' not in layer.name:
+		continue
+	# get filter weights
+	filters, biases = layer.get_weights()
+	print( filters.shape)
+'''
 # normalize filter values to 0-1 so we can visualize them
 f_min, f_max = filters.min(), filters.max()
 filters = (filters - f_min) / (f_max - f_min)
@@ -24,3 +31,4 @@ for i in range(n_filters):
 		ix += 1
 # show the figure
 pyplot.show()
+'''
