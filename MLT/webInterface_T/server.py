@@ -65,6 +65,7 @@ app.layout = html.Div(
 		html.Button(id="train", n_clicks=0, children="Train"),
 	]
 )
+app.run()
 '''
 import numpy as np
 import tensorflow as tf

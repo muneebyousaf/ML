@@ -1,0 +1,9 @@
+.flex-container {
+display: flex;
+padding: 5px;
+flex-wrap: nowrap;
+background-color: #EEEEEE;
+}
+.flex-container > * {
+flex-grow: 1
+}
