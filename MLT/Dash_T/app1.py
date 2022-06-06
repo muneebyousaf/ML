@@ -22,7 +22,7 @@ fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
 
 app.layout = html.Div(children=[
     html.H1(children='Hello Muneeb'),
-    html.H1(children='Hello Yousaf'),
+
 
     html.Div(children='''
         Dash: A web application framework fotring.'''),

@@ -4,17 +4,19 @@ from tensorflow.keras.datasets import mnist
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Dense, AveragePooling2D, Flatten
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import Callback, EarlyStopping
 import plotly.express as px
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State
 from flask import Flask
+import json
 server = Flask("mlm")
 app = Dash(server=server)
 # Load MNIST digits
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
-print(X_train)
+
 X_train = np.expand_dims(X_train, axis=3).astype("float32")
+
 X_test = np.expand_dims(X_test, axis=3).astype("float32")
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
@@ -28,6 +30,29 @@ model_data = {
 "batchsize": 32,
 }
 
+train_status = {
+"running": False,
+"epoch": 0,
+"batch": 0,
+"batch metric": None,
+"last epoch": None,
+}
+
+class ProgressCallback(Callback):
+	def on_train_begin(self, logs=None):
+		train_status["running"] = True
+		train_status["epoch"] = 0
+	def on_train_end(self, logs=None):
+		train_status["running"] = False
+	def on_epoch_begin(self, epoch, logs=None):
+		train_status["epoch"] = epoch
+		train_status["batch"] = 0
+	def on_epoch_end(self, epoch, logs=None):
+		train_status["last epoch"] = logs
+	def on_train_batch_begin(self, batch, logs=None):
+		train_status["batch"] = batch
+		def on_train_batch_end(self, batch, logs=None):
+			train_status["batch metric"] = logs
 
 def train():
 	activation = model_data["activation"]
@@ -107,6 +132,8 @@ app.layout = html.Div(
 			]
 		),
 		html.Button(id="train", n_clicks=0, children="Train"),
+		html.Pre(id="progressdisplay"),
+		dcc.Interval(id="trainprogress", n_intervals=0, interval=1000),
 		dcc.Graph(id="historyplot"),
 	]
 )
@@ -115,6 +142,7 @@ app.layout = html.Div(
 @app.callback(Output(component_id="epochdisplay", component_property="children"),
 	Input(component_id="epochs", component_property="value"))
 
+
 def update_epochs(value):
 	model_data["epochs"] = value
 	return f"Epochs: {value}"
@@ -122,6 +150,7 @@ def update_epochs(value):
 @app.callback(Output("batchdisplay", "children"),
 	Input("batchsize", "value"))
 
+	
 def update_batchsize(value):
 	model_data["batchsize"] = value
 	return f"Batch size: {value}"
@@ -168,14 +197,15 @@ def train_action(n_clicks, activation, optimizer, epoch, batchsize):
 	return fig
 @app.callback(Output("progressdisplay", "children"),
 	Input("trainprogress", "n_intervals"))
-def update_progress(n):
+
+def update_progressdisplay(n):
 	return json.dumps(train_status, indent=4)
 
-app.clientside_callback(
-	"function() { pageinit(); };",
-	Output("dummy", "children"),
-	Input("dummy", "children")
-)
+# app.clientside_callback(
+#  	"function() { pageinit(); };",
+#  	Output("dummy", "children"),
+#  	Input("dummy", "children")
+#  )
 
 @server.route("/recognize", methods=["POST"])
 def recognize():
