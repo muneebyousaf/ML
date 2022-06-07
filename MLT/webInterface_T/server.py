@@ -122,7 +122,7 @@ app.layout = html.Div(
 				html.Div(children=[
 					html.Div(id="epochdisplay", children="Epochs:"),
 					dcc.Slider(1, 200, 1, marks={1: "1", 100: "100", 200: "200"},
-					value=model_data["epochs"], id="epochs"),
+						value=model_data["epochs"], id="epochs"),
 				]),
 				html.Div(children=[
 					html.Div(id="batchdisplay", children="Batch size:"),
@@ -149,26 +149,16 @@ def update_epochs(value):
 
 @app.callback(Output("batchdisplay", "children"),
 	Input("batchsize", "value"))
-
-	
 def update_batchsize(value):
 	model_data["batchsize"] = value
 	return f"Batch size: {value}"
+
 
 @app.callback(Output("activationdisplay", "children"),
 	Input("activation", "value"))
 
 def update_activation(value):
-	model_data["activation"] = value
 	return f"Activation: {value}"
-
-
-@app.callback(Output("optimizerdisplay", "children"),
-	Input("optimizer", "value"))
-
-def update_optimizer(value):
-	model_data["optimizer"] = value
-	return f"Optimizer: {value}"
 
 
 @app.callback(Output("historyplot", "figure"),
@@ -194,7 +184,7 @@ def train_action(n_clicks, activation, optimizer, epoch, batchsize):
 	fig = px.line(history, title="Model training metrics")
 	fig.update_layout(xaxis_title="epochs",
 		yaxis_title="metric value", legend_title="metrics")
-	return fig
+	return fig 
 @app.callback(Output("progressdisplay", "children"),
 	Input("trainprogress", "n_intervals"))
 
