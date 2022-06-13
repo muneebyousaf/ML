@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Conv2D, Dense, AveragePooling2D, Flatten
 import tensorflow.keras.backend as K
 
 # csv files in the path
@@ -64,29 +65,54 @@ y = LabelEncoder().fit_transform(y)
 print(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.43)
 
+
+X_train = X_train.reshape(1,X_train.shape[0], X_train.shape[1],1)
+
+
 print(y)
 print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
-n_features = X_train.shape[1]
-
-print(n_features)
+#Model definition 
 
 
-# define model
 model = Sequential()
-model.add(Dense(10, activation='relu', kernel_initializer='he_normal', input_shape=(n_features,)))
-model.add(Dense(8, activation='relu', kernel_initializer='he_normal'))
+model.add(Conv2D(6, (5, 5), activation='relu',input_shape=(1,X_train.shape[0],X_train.shape[1],1), padding="same"))
+model.add(AveragePooling2D((2, 2), strides=2))
+model.add(Conv2D(16, (5, 5), activation='relu'))
+model.add(AveragePooling2D((2, 2), strides=2))
+model.add(Conv2D(120, (5, 5), activation='relu'))
+model.add(Flatten())
+model.add(Dense(84, activation='relu'))
+model.add(Dense(10, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-print(" training .....")
-print(type(X_train))
-model.fit(X_train, y_train, epochs=150, batch_size=32, verbose=0)
+model.compile(loss='binary_crossentropy',optimizer='adam',metrics=["accuracy"])
+model.fit(X_train, y_train, validation_data=(X_test, y_test),epochs=150,
+				batch_size=32,
+				verbose=0)
 
+
+
+
+
+exit(1)
+
+'''
 
 loss, acc = model.evaluate(X_test, y_test, verbose=0)
 print('Test Accuracy: %.3f' % acc)
 print('loss: %.3f' % loss)
+
+
+Conv2D(6, (5, 5), activation='relu',
+		input_shape=(28, 28, 1), padding="same"),
+		AveragePooling2D((2, 2), strides=2),
+		Conv2D(16, (5, 5), activation=activation),
+		AveragePooling2D((2, 2), strides=2),
+		Conv2D(120, (5, 5), activation=activation),
+		Flatten(),
+		Dense(84, activation=activation),
+		Dense(10, activation="softmax")
 
 
 total_count=0
@@ -273,8 +299,8 @@ print(' Number of times SPEC benchmark was correctly detected: %d' %SPEC_true_pr
 print(' Number of time SPEC benchmark could not be detected: %d '%SPEC_false_prediction)
 
 
-''''
-
+'''
+'''
 print(' total test ' +  str(total_count))
 print('true predict  ' + str(true_predict))
 print('false predict ' + str(wrong_predict))
