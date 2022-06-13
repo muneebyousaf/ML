@@ -22,6 +22,7 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import mlp_model
+from mlp_model import *
 import dash_table as dt
 
 
@@ -57,7 +58,7 @@ app.layout = html.Div(
 						{"label": "CNN", "value": "cnn"},
 						
 						],
-						value=global_data.model_data["model"]
+						value=global_data.model_data["model_type"]
 					),
 				]),
        
@@ -114,7 +115,12 @@ app.layout = html.Div(
 		html.Button(id="train", n_clicks=0, children="Train"),
 		html.Pre(id="progressdisplay"),
 		dcc.Interval(id="trainprogress", n_intervals=0, interval=1000),
-		#dcc.Graph(id="historyplot"),
+		dcc.Graph(id="historyplot"),
+		#html.Div(id="training_status",children="my text"),
+		
+    	
+		
+
 
         html.H2(
 			children="Model testing",
@@ -170,6 +176,31 @@ app.layout = html.Div(
     
 )
 
+
+
+
+
+@app.callback(Output(component_id="epochdisplay", component_property="children"),
+	Input(component_id="epochs", component_property="value"))
+
+
+def update_epochs(value):
+	global_data.model_data["epochs"] = value
+	return f"Epochs: {value}"
+
+@app.callback(Output("batchdisplay", "children"),
+	Input("batchsize", "value"))
+def update_batchsize(value):
+	global_data.model_data["batchsize"] = value
+	return f"Batch size: {value}"
+
+
+@app.callback(Output("activationdisplay", "children"),
+	Input("activation", "value"))
+
+def update_activation(value):
+	return f"Activation: {value}"
+
 @app.callback(Output("progressdisplay", "children"),
 	Input("trainprogress", "n_intervals"))
 	
@@ -177,6 +208,15 @@ app.layout = html.Div(
 def update_progressdisplay(n):
 	
 	return json.dumps(global_data.train_status, indent=4)
+
+
+@app.callback(Output("historyplot","figure"),
+	Input("train", "n_clicks"),
+	State("activation", "value"),
+	State("optimizer", "value"),
+	State("epochs", "value"),
+	State("batchsize", "value"),
+	prevent_initial_call=True)
 
 
 
@@ -187,19 +227,18 @@ def train_action(n_clicks, activation, optimizer, epoch, batchsize):
 		"epcoh": epoch,
 		"batchsize": batchsize,
 	})
-
 	if global_data.model_data["model_type"] == "mlp":
 		X_train, X_test, y_train, y_test,n_features= global_data.mlp_training_data()
-		model, history=mlp_model.mlp_train(X_train, X_test, y_train, y_test,n_features)
+		model, history=mlp_train(X_train, X_test, y_train, y_test,n_features)
+	
 
-
-	model, history = train()
 	global_data.model_data["model"] = model # keep the trained model
 	history = pd.DataFrame(history.history)
 	fig = px.line(history, title="Model training metrics")
-	fig.update_layout(xaxis_title="epochs",
-		yaxis_title="metric value", legend_title="metrics")
-	return fig 
+	#fig.update_layout(xaxis_title="epochs",
+	#	yaxis_title="metric value", legend_title="metrics")
+	return fig
+ 
 
 
 

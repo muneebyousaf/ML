@@ -89,6 +89,8 @@ print('Test Accuracy: %.3f' % acc)
 print('loss: %.3f' % loss)
 
 
+exit()
+
 total_count=0
 wrong_predict=0
 true_predict=0

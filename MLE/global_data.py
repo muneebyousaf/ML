@@ -24,6 +24,9 @@ train_status = {
 }
 
 
+
+
+
 def mlp_training_data():
     file_list = glob.glob("*.xlsx")
 
@@ -49,7 +52,7 @@ def mlp_training_data():
 
     df1 = df1[['simulaton tick','L1 Instruction Cache Hits', 'L1 Instruction Cache Misses','L1 Data Cache Hits','L1 Data Cache Misses','Last Level Cache Hits','Last Level Cache Misses','DRAM Page Hit Rate ','status','label']] 
     #test_df1=df1[['L1 Instruction Cache Hits', 'L1 Instruction Cache Misses','L1 Data Cache Hits','L1 Data Cache Misses','Last Level Cache Hits','Last Level Cache Misses','DRAM Page Hit Rate ','label']]
-    print(df1)
+  #  print(df1)
     #print(test_df1)
 
     #print(df1)
@@ -63,7 +66,7 @@ def mlp_training_data():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.43)
 
     #print(y)
-    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+#    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
     n_features = X_train.shape[1]
 
